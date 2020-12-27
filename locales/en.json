@@ -1,0 +1,67 @@
+{
+	"get_started": {
+		"welcome": "Hi {{telegram_name}}!\nWelcome to InnGangBot.",
+		"security": "To enhance security, you are recommended to change the following privacy settings\n*Step1*: Click Setting in Telegram App\n*Step2*: Click Privacy and Security\n*Step3*: update password in Two\\-Step Verification\n*Step4*: Change to Nobody for Phone Number Setting",
+		"help": "{{telegram_name}}, What else can we do for you today?",
+		"cant_help": "{{telegram_name}}, I can't help you anything for now."
+	},
+	"fallback": {
+		"any": "Sorry I haven't learnt to communicate with you yet",
+		"unexpected": "I am sorry that unexpected error occured. I have informed the developer",
+		"server_error": "I am sorry that unexpected error occured. I have informed the developer"
+	},
+	"menu": {
+		"register": "Register",
+		"invite": "Invite",
+		"login": "Login",
+		"join": "Join Group",
+		"logout": "Logout",
+		"language": "Change Language",
+		"unban": "Unban {{to.telegram_name}}",
+		"ground": "Customer",
+		"not_ground": "Distributor"
+	},
+	"invite": {
+		"not_allowed": "You are not allowed to invite",
+		"pre_instruction": "Please send the following instruction and code to the person you want to invite",
+		"ask_ground": "Are you inviting a customer? Customer need to CheckIn everyday။ If customer doesn't CheckIn, the person will be Auto Logout.",
+		"instruction": "*Step1*: click t\\.me/{{telegram_user_name}}\n*Step2*: click *Start* button \\(or\\) send */start*\n*Step3*: click *Register* button\n*Step4*: send the following code"
+	},
+	"register": {
+		"not_allowed": "You are not allowed to register",
+		"ask_code": "Please send me the invitation code",
+		"invalid_code": "Invalid code provided",
+		"ask_pin": "Please provide the pin for relogin later.\nPin must be between 6 to 10 digit.",
+		"invalid_pin": "Invalid pin provided",
+		"completed": "Your registration is completed\\. You may proceed to click *Join Group*"
+	},
+	"login": {
+		"not_allowed": "You are not allowed to login",
+		"ask_pin": "Please send me the pin you provided during your registration",
+		"invalid_pin": "Invalid pin provided",
+		"ready": "You may proceed to click *Join Group*",
+		"completed": "You have successfully Joined"
+	},
+	"logout": {
+		"not_allowed": "you are not allowed to logout",
+		"completed": "I have successfully log you out from the group"
+	},
+	"language": {
+		"not_allowed": "you are not allowed to change language",
+		"prompt": "Which language do you prefer?",
+		"english": "English",
+		"myanmar": "Myanmar",
+		"myanmar_changed": "နောက်ဆို မြန်မာလို ပြန်ပြောပေးပါမယ်။",
+		"english_changed": "Sure, I will chat you in English"
+	},
+	"ban": {
+		"inform_user": "You are kicked by *{{from.telegram_name}}* thus you are ban\\.\nPlease inform your inviter or admin to unban you\\.",
+		"inform_admin": "*{{from.telegram_name}}* kicked *{{to.telegram_name}}* thus *{{to.telegram_name}}* was banned"
+	},
+	"unban": {
+		"inform_user": "You are unban by *{{telegram_name}}*\\."
+	},
+	"checkin": {
+		"prompt": "Please check in before 11PM. Otherwise, you will be log out automatically."
+	}
+}

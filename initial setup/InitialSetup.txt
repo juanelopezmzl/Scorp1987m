@@ -1,0 +1,4 @@
+Create Database : Refer to DatabaseSetup.sql
+Get Bot from Bot Father : Refer to https://core.telegram.org/bots#3-how-do-i-create-a-bot
+To use local Bot API server : Refer to https://core.telegram.org/bots/api#using-a-local-bot-api-server
+Configure webhook to the telegram endpoint define in the app.js : Refer to https://core.telegram.org/bots/api#setwebhook
