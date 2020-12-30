@@ -5,13 +5,17 @@ const
 	PORT = process.env.PORT || 5000;
 const
   config = require('./config'),
+  i18n = require('./i18n.config'),
   secConfig = require('./security/config'),
   telConfig = require('./telegram/config');
 const
   userDb = require('./database/user'),
-  logDb = require('./database/logging'),
-  telegramReceive = require('./telegram/receive');
-
+  logDb = require('./database/logging');
+const
+  botApi = require('./telegram/botApi'),
+  telegramReceive = require('./telegram/receive'),
+  CheckIn = require('./telegram/checkin');
+  
 
 // Parse application/x-www-form-urlencoded
 app.use(
@@ -34,7 +38,9 @@ app.use(json());
 
 
 function Authenticate(req, res, verify_token){
-	const token = req.query['verify_token'];
+	//const token = req.query['verify_token'];
+
+  const token = req.headers.verify_token;
 	if(!token){
 		// Responds with '403 Forbidden' if verify tokens do not match
 		res.sendStatus(403);
@@ -56,7 +62,7 @@ app.get(config.userUrl, async (req, res) => {
   if(!Authenticate(req, res, config.userToken)) return;
 
   try{
-    res.status(200).send(await userDb.getUserAsync());
+    res.status(200).send(await userDb.getUsersAsync());
   }
   catch(ex){
     res.status(400).send({
@@ -113,8 +119,8 @@ app.post(config.telegramUrl, async (req, res) => {
   const body = req.body;
 
   // For Debugging only. Please disable for Production
-  // console.log('Received Telegram Webhook:');
-  // console.dir(body, {depth: null});
+  console.log('Received Telegram Webhook:');
+  console.dir(body, {depth: null});
 
   res.status(200).send('EVENT_RECEIVED');
 
@@ -132,6 +138,39 @@ app.post(config.telegramUrl, async (req, res) => {
   }
   else if(body.callback_query)
     await telegramReceive.handleCallbackQueryAsync(body);
+})
+
+
+// Endpoint to send Check in Message
+app.post(config.sendCheckinUrl, async (req, res) => {
+  if(!Authenticate(req, res, config.sendCheckinToken)) return;
+
+  res.status(200).send('SEND_CHECK_IN_RECEIVED');
+  const users = await userDb.getRequireCheckInUsersAsync();
+  if(!users) return;
+  users.forEach(async function(user){
+    try{
+      await CheckIn.sendCheckInMessageAsync(user);
+    }
+    catch(ex){
+      console.error(ex);
+    }
+  })
+})
+
+
+// Endpoint for logout if not checkin
+app.post(config.logoutUrl, async(req, res)=>{
+  if(!Authenticate(req, res, config.logoutToken)) return;
+
+  res.status(200).send('LOGOUT_RECEIVED');
+  const users = await userDb.getRequireLogoutUsersAsync(config.logoutPreviousHours);
+  if(!users) return;
+  console.log(users);
+  users.forEach(async (user) =>{
+      i18n.setLocale(user.language);
+      await botApi.banChatMember(user.telegram_user_id);
+  });
 })
 
 

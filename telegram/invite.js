@@ -36,65 +36,55 @@ module.exports = class Invite{
     async handleCallbackQueryAsync(data){
         const chat_id = this.webhookEvent.callback_query.message.chat.id;
 
+        this.payload.complete();
+
         switch(data){
             case Invite.type:
                 await botApi.editTextAndRemoveReplyMarkupAsync(this.webhookEvent, i18n.__('menu.invite'));
-                if(allowInvite(this.user)){
-                    // Ask whether is gound or not
-                    await botApi.callMethodAsync('sendMessage', {
-                        chat_id: chat_id,
-                        text: i18n.__('invite.ask_ground'),
-                        reply_markup: { inline_keyboard: [[{
-                            text: i18n.__('menu.ground'),
-                            callback_data: Invite.type+'_GROUND'
-                        }],
-                        [{
-                            text: i18n.__('menu.not_ground'),
-                            callback_data: Invite.type+'_NOT_GROUND'
-                        }]]}});
-                }
-                else{
-                    await botApi.sendTextMessageAsync(chat_id, i18n.__('invite.not_allowed'));
+
+                if(!allowInvite(this.user)){
                     await logDb.addLogAsync(this.user.telegram_user_id, TRYINVITE);
+                    await botApi.sendTextMessageAsync(chat_id, i18n.__('invite.not_allowed'));
                     await help.sendHelpAsync(this.user);
+                    return;
                 }
+
+                // Ask whether is gound or not
+                await botApi.callMethodAsync('sendMessage', {
+                    chat_id: chat_id,
+                    text: i18n.__('invite.ask_ground'),
+                    reply_markup: { inline_keyboard: [[{
+                        text: i18n.__('menu.ground'),
+                        callback_data: `${Invite.type}_GROUND`
+                    }],
+                    [{
+                        text: i18n.__('menu.not_ground'),
+                        callback_data: `${Invite.type}_NOT_GROUND`
+                    }]]}});
                 break;
-            case Invite.type+'_GROUND':
-                await botApi.editTextAndRemoveReplyMarkupAsync(this.webhookEvent, i18n.__('menu.ground'));
-                if(allowInvite(this.user)){
-                    const invite = await inviteDb.addInviteAsync(this.user.telegram_user_id, true);
-                    const botUser = new User(await botApi.getMeAsync());
-                    await botApi.sendTextMessageAsync(chat_id, i18n.__('invite.pre_instruction'));
-                    await botApi.sendMarkdownV2TextMessageAsync(chat_id, i18n.__('invite.instruction', botUser));
-                    await botApi.sendTextMessageAsync(chat_id, invite.code);
-                    await help.sendHelpAsync(this.user);
-                }
-                else{
-                    await botApi.sendTextMessageAsync(chat_id, i18n.__('invite.not_allowed'));
+            case `${Invite.type}_GROUND`:
+            case `${Invite.type}_NOT_GROUND`:
+                const menu = (data==`${Invite.type}_GROUND`) ? 'menu.ground' : 'menu.not_ground';
+                const isground = (data==`${Invite.type}_GROUND`) ? true : false;
+                await botApi.editTextAndRemoveReplyMarkupAsync(this.webhookEvent, i18n.__(menu));
+                
+                if(!allowInvite(this.user)){
                     await logDb.addLogAsync(this.user.telegram_user_id, TRYINVITE);
-                    await help.sendHelpAsync(this.user);
-                }
-                break;
-            case Invite.type+'_NOT_GROUND':
-                await botApi.editTextAndRemoveReplyMarkupAsync(this.webhookEvent, i18n.__('menu.not_ground'));
-                if(allowInvite(this.user)){
-                    const invite = await inviteDb.addInviteAsync(this.user.telegram_user_id, false);
-                    const botUser = new User(await botApi.getMeAsync());
-                    await botApi.sendTextMessageAsync(chat_id, i18n.__('invite.pre_instruction'));
-                    await botApi.sendMarkdownV2TextMessageAsync(chat_id, i18n.__('invite.instruction',botUser));
-                    await botApi.sendTextMessageAsync(chat_id, invite.code);
-                    await help.sendHelpAsync(this.user);
-                }
-                else{
                     await botApi.sendTextMessageAsync(chat_id, i18n.__('invite.not_allowed'));
-                    await logDb.addLogAsync(this.user.telegram_user_id, TRYINVITE);
                     await help.sendHelpAsync(this.user);
+                    return;
                 }
+
+                const invite = await inviteDb.addInviteAsync(this.user.telegram_user_id, isground);
+                const botUser = new User(await botApi.getMeAsync());
+                await botApi.sendTextMessageAsync(chat_id, i18n.__('invite.pre_instruction'));
+                await botApi.sendMarkdownV2TextMessageAsync(chat_id, i18n.__('invite.instruction', botUser));
+                await botApi.sendTextMessageAsync(chat_id, invite.code);
+                await help.sendHelpAsync(this.user);
                 break;
             default:
                 help.sendUnexpectedError(this.user.telegram_user_id, 'invite.handleCallbackQueryAsync');
                 break;
         }
-        this.payload.complete();
     }
 }

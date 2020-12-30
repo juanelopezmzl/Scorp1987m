@@ -1,6 +1,6 @@
 const
     User = require('../types/user'),
-    { OWNER, INGROUP, STANDBY, READY } = require('../types/userstatus');
+    { OWNER, INGROUP, STANDBY, READY, INACTIVE } = require('../types/userstatus');
 
 module.exports = {
     allowChangeLanguage(user){
@@ -22,7 +22,7 @@ module.exports = {
      * @returns 
      */
     allowRegister(user){
-        return (user) && !(user.status);
+        return (user) && (!user.status || (!user.pin && user.status != OWNER ));
     },
 
     /**
@@ -59,5 +59,14 @@ module.exports = {
      */
     allowCheckin(user){
         return (user) && (user.status==INGROUP || user.status==READY);
+    },
+
+    /**
+     * 
+     * @param {User} user 
+     * @returns 
+     */
+    allowUnban(user){
+        return (user) && (user.status==INACTIVE)
     }
 }

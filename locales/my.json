@@ -17,9 +17,10 @@
 		"join": "အဖွဲ့ထဲ ဝင်ရန်",
 		"logout": "Logout",
 		"language": "ဘာသာပြောင်းရန်",
-		"unban": "Unban {{to.telegram_name}}",
-		"ground": "ရောင်းသူ",
-		"not_ground": "ဝယ်သူ"
+		"unban": "Unban {{telegram_name}}",
+		"ground": "ဝယ်သူ",
+		"not_ground": "ရောင်းသူ",
+		"checkin": "Checkin"
 	},
 	"invite": {
 		"not_allowed": "ဖိတ်ခေါ်ရန် သင့်အား ခွင့်မပြုထားပါ။",
@@ -55,13 +56,18 @@
 		"english_changed": "Sure, I will chat you in English"
 	},
 	"ban": {
-		"inform_user": "လူကြီးမင်းကို *{{from.telegram_name}}* မှထုတ်လိုက်ပါတယ်။\nဒါကြောင့်လူကြီးမင်းကို တားမြစ်လိုက်ပါပြီ။\nသင့်အား ဖိတ်ကြားသူ သို့မဟုတ် စီမံခန့်ခွဲသူကို တားမြစ်ချက်ကို ဖယ်ရှားရန် အကြောင်းကြားပါ။\\.",
-		"inform_admin": "*{{from.telegram_name}}* kicked *{{to.telegram_name}}* thus *{{to.telegram_name}}* was banned"
+		"inform_user": "လူကြီးမင်းကို *{{from_telegram_name}}* မှထုတ်လိုက်ပါတယ်။\nဒါကြောင့်လူကြီးမင်းကို တားမြစ်လိုက်ပါပြီ။\nသင့်အား ဖိတ်ကြားသူ သို့မဟုတ် စီမံခန့်ခွဲသူကို တားမြစ်ချက်ကို ဖယ်ရှားရန် အကြောင်းကြားပါ။\\.",
+		"inform_admin": "*{{from_telegram_name}}* kicked *{{to_telegram_name}}* thus *{{to_telegram_name}}* was banned"
 	},
 	"unban": {
-		"inform_user": "သင့်ရဲ့ တားမြစ်ချက်ကို *{{telegram_name}}* မှဖယ်ရှားလိုက်ပါပြီ။"
+		"inform_user": "သင့်ရဲ့ တားမြစ်ချက်ကို *{{telegram_name}}* မှဖယ်ရှားလိုက်ပါပြီ။",
+		"not_allowed": "{{telegram_name}} ကို Unban လုပ်စရာမလိုပါ။"
 	},
 	"checkin": {
-		"prompt": "Check-in ကို ည ၁၁ နာရီမတိုင်ခင်လုပ်ပေးပါ။ ည ၁၁ နာရီထိုးလို့မှ မလုပ်ရင် သင့်အကောင့်က logout ဖြစ်သွားမှာပါ။"
+		"prompt": "{{telegram_name}}\nCheck-in ကို ည ၁၁ နာရီမတိုင်ခင်လုပ်ပေးပါ။ ည ၁၁ နာရီထိုးလို့မှ မလုပ်ရင် သင့်အကောင့်က logout ဖြစ်သွားမှာပါ။",
+		"not_allowed": "Checkin လုပ်ရန် အခုမလိုအပ်ပါ။",
+		"ask_pin": "မှတ်ပုံတင်စဉ် ပေးထားသော ပင်နံပါတ် ပေးပါ။",
+		"invalid_pin": "မမှန်ကန်သော ပင်နံပါတ် ပေးထားပါတယ်။",
+		"completed": "သင်အောင်မြင်စွာ Checkin ပြီးပါပြီ။"
 	}
 }

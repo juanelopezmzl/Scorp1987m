@@ -8,7 +8,7 @@ const
 const
     User = require('../types/user'),
     Progress = require('../types/progress'),
-    { INGROUP, STANDBY, INACTIVE, READY } = require('../types/userstatus'),
+    { INGROUP, STANDBY, INACTIVE } = require('../types/userstatus'),
     { TRYJOIN, LOGIN, ADDED, LEFT, LOGOUT, BAN } = require('../types/logactivity');
 const
     config = require('./config'),
@@ -20,29 +20,29 @@ const
     Login = require('./login'),
     Logout = require('./logout'),
     Unban = require('./unban'),
+    CheckIn = require('./checkin'),
     { isReady, allowLogout } = require('./check');
 
-    /**
-     * 
-     * @param member 
-     * @param {string} status 
-     * @returns 
-     */
-    const addUpdateUserStatusAsync = async function(member, status){
-        let user = await userDb.getUserByIdAsync(member.id);
-        if(user)
-            return await userDb.updateStatusAsync(member.id, status);
-        else{
-            const user = new User(member);
-            user.status = status;
-            return await userDb.addUserAsync(user);
-        }
+/**
+ * 
+ * @param {User} user 
+ * @param {string} status 
+ * @returns 
+ */
+const addUpdateUserStatusAsync = async function(user, status){
+    let userFromDb = await userDb.getUserByIdAsync(user.telegram_user_id);
+    if(userFromDb)
+        return await userDb.updateStatusAsync(user.telegram_user_id, status);
+    else{
+        user.status = status;
+        return await userDb.addUserAsync(user);
     }
+}
 
 /** @type {User} */
 let botUser = null;
 
-const WorkFlows = [Language, Invite, Register, Login, Logout, Unban];
+const WorkFlows = [Language, Invite, Register, Login, Logout, Unban, CheckIn];
 
 const inprogress = {};
 
@@ -237,7 +237,9 @@ module.exports = {
                     // If administrator is added personally. the person will not be able to Login back if left from group
                     else{
                         await logDb.addLogAsync(member.id, ADDED, from_id);
-                        await addUpdateUserStatusAsync(new User(member), INGROUP);
+                        const user = new User(member);
+                        user.inviter_telegram_user_id = from_id;
+                        await addUpdateUserStatusAsync(user, INGROUP);
                     }
                 }
             }
@@ -274,8 +276,8 @@ module.exports = {
                     const from_user = await userDb.getUserByIdAsync(from_id);
                     const user = await userDb.getUserByIdAsync(member.id);
                     const obj = {
-                        from: from_user,
-                        to: user
+                        from_telegram_name: botApi.getMarkdownV2Text(from_user.telegram_name),
+                        to_telegram_name: botApi.getMarkdownV2Text(user.telegram_name)
                     }
                     if(user){
                         await userDb.updateStatusAsync(member.id, INACTIVE);
@@ -287,8 +289,8 @@ module.exports = {
                         parse_mode: 'MarkdownV2',
                         reply_markup: {
                             inline_keyboard: [[{
-                                text: i18n.__('menu.unban', obj),
-                                callback_data: `UNBAN_${user.telegram_user_id}`
+                                text: i18n.__('menu.unban', user),
+                                callback_data: `${Unban.type}_${user.telegram_user_id}`
                             }]]
                         }
                     });

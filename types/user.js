@@ -15,7 +15,13 @@ module.exports = class User{
     language = 'my';
 
     /** @type {number} */
-    invite_id = null;
+    inviter_telegram_user_id = null;
+
+    /** @type {string | Date} */
+    invite_code_generated_date = null;
+
+    // /** @type {number} */
+    // invite_id = null;
 
     /** @type {string | Date} */
     registered_date = null;
@@ -38,7 +44,8 @@ module.exports = class User{
             this.telegram_user_name = item.telegram_user_name;
             this.pin = item.pin;
             this.language = (item.language) ? item.language : 'my';
-            this.invite_id = item.invite_id;
+            this.inviter_telegram_user_id = item.inviter_telegram_user_id;
+            this.invite_code_generated_date = item.invite_code_generated_date;
             this.registered_date = item.registered_date;
             this.status = item.status;
             this.is_ground = item.is_ground;

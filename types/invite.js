@@ -15,7 +15,7 @@ module.exports = class Invite{
     is_used = false;
 
     /** @type {boolean} */
-    is_ground = true;
+    is_ground = false;
 
     constructor(invite){
         this.invite_id = (invite.invite_id) ? invite.invite_id : null;

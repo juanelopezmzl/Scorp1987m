@@ -5,6 +5,16 @@ const
         ssl: { rejectUnauthorized: false }
     });
 
+    /**
+     * 
+     * @param {*} value 
+     * @returns {string}
+     */
+const getString = (value) => {
+    if(value instanceof Date) return value.toISOString();
+    else return `${value}`;
+}
+
 module.exports = {
     /**
      * 
@@ -15,19 +25,15 @@ module.exports = {
      */
     async executeQueryAsync(sql){
         let client;
-        let result;
 
         try{
             client = await pool.connect();
-            result = await client.query(sql);
-        }
-        catch(ex){
-            console.error(ex);
+            const result = await client.query(sql);
+            return result;
         }
         finally{
             if(client)
                 client.release();
-            return result;
         }
     },
 
@@ -46,7 +52,7 @@ module.exports = {
             if(key in item){
                 colstr += `,${key}`;
                 valstr += ',';
-                valstr += (item[key] != null) ? `'${item[key]}'` : 'NULL';
+                valstr += (item[key] != null) ? `'${getString(item[key])}'` : 'NULL';
             }
         });
         colstr = (colstr.length>0) ? colstr.substring(1) : '';
@@ -67,7 +73,7 @@ module.exports = {
         updatableFields.forEach(function(key){
             if(key in item){
                 valstr += `,${key}=`;
-                valstr += (item[key] != null) ? `'${item[key]}'` : 'NULL';
+                valstr += (item[key] != null) ? `'${getString(item[key])}'` : 'NULL';
             }
         });
         valstr = (valstr.length>0) ? valstr.substring(1) : '';
@@ -84,12 +90,11 @@ module.exports = {
     getInValueString(values){
         let str = '';
         values.forEach(function (key){
-            str += `,'${key}'`;
+            str += `,'${getString(key)}'`;
         });
         str = (str.length>0) ? str.substring(1) : '';
         return str;
     },
-
 
     /**
      * 
@@ -99,7 +104,7 @@ module.exports = {
         if(!values) return null;
         let str = '';
         values.forEach(function (key){
-            str += `,${key}='${values[key]}'`;
+            str += `,${key}='${getString(values[key])}'`;
         });
         str = (str.length>0) ? str.substring(1) : '';
         return str;

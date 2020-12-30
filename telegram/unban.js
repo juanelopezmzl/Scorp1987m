@@ -11,6 +11,7 @@ const
     config = require('./config');
 const help = require('./help');
 const botApi = require('./botApi');
+const { allowUnban } = require('./check');
 
 
 module.exports = class Unban{
@@ -37,18 +38,32 @@ module.exports = class Unban{
         const from = this.webhookEvent.callback_query.from;
         if(chat_id != config.adminChatID) return;
 
+        this.payload.complete();
         if(data.startsWith('UNBAN_')){
             const telegram_user_id = Number(data.substring(6));
-            //await botApi.unbanChatMember(telegram_user_id);
+            const user = await userDb.getUserByIdAsync(telegram_user_id);
+
+            if(!allowUnban(user))
+            {
+                await botApi.callMethodAsync('answerCallbackQuery', {
+                    callback_query_id: this.webhookEvent.callback_query.id,
+                    text: i18n.__('unban.not_allowed', user),
+                    show_alert: true
+                });
+                return;
+            }
+
+            await botApi.unbanChatMember(telegram_user_id);
             await logDb.addLogAsync(telegram_user_id, UNBAN, from.id)
             await userDb.updateStatusAsync(telegram_user_id, STANDBY);
             await botApi.removeReplyMarkupAsync(this.webhookEvent);
             const fromUser = new User(from);
-            botApi.sendMarkdownV2TextMessageAsync(telegram_user_id, i18n.__('unban.inform_user', fromUser));
+            await botApi.sendMarkdownV2TextMessageAsync(telegram_user_id, i18n.__('unban.inform_user', {
+                telegram_name: botApi.getMarkdownV2Text(fromUser.telegram_name)
+            }));
         }
         else{
             help.sendUnexpectedError(null, 'unban.handleCallbackQueryAsync');
         }
-        this.payload.complete();
     }
 }

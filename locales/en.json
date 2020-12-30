@@ -17,9 +17,10 @@
 		"join": "Join Group",
 		"logout": "Logout",
 		"language": "Change Language",
-		"unban": "Unban {{to.telegram_name}}",
+		"unban": "Unban {{telegram_name}}",
 		"ground": "Customer",
-		"not_ground": "Distributor"
+		"not_ground": "Distributor",
+		"checkin": "Checkin"
 	},
 	"invite": {
 		"not_allowed": "You are not allowed to invite",
@@ -55,13 +56,18 @@
 		"english_changed": "Sure, I will chat you in English"
 	},
 	"ban": {
-		"inform_user": "You are kicked by *{{from.telegram_name}}* thus you are ban\\.\nPlease inform your inviter or admin to unban you\\.",
-		"inform_admin": "*{{from.telegram_name}}* kicked *{{to.telegram_name}}* thus *{{to.telegram_name}}* was banned"
+		"inform_user": "You are kicked by *{{from_telegram_name}}* thus you are ban\\.\nPlease inform your inviter or admin to unban you\\.",
+		"inform_admin": "*{{from_telegram_name}}* kicked *{{to_telegram_name}}* thus *{{to_telegram_name}}* was banned"
 	},
 	"unban": {
-		"inform_user": "You are unban by *{{telegram_name}}*\\."
+		"inform_user": "You are unban by *{{telegram_name}}*\\.",
+		"not_allowed": "Not require to unban {{telegram_name}}."
 	},
 	"checkin": {
-		"prompt": "Please check in before 11PM. Otherwise, you will be log out automatically."
+		"prompt": "{{telegram_name}}\nPlease check in before 11PM. Otherwise, you will be log out automatically.",
+		"not_allowed": "you are not required to check-in now.",
+		"ask_pin": "Please send me the pin you provided during your registration",
+		"invalid_pin": "Invalid pin provided",
+		"completed": "You have successfully Checkin"
 	}
 }

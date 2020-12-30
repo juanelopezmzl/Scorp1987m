@@ -105,14 +105,14 @@ module.exports = {
      * 
      * Send any server error to user and admin group
      */
-    async sendServerErrorAsync(telegram_user_id, path, payload){
+    sendServerErrorAsync(telegram_user_id, path, payload){
         botApi.sendTextMessageAsync(config.adminChatID, JSON.stringify({
             message: `error occured at ${path}`,
             user_id: telegram_user_id,
             paylaod: payload
         }));
         if(telegram_user_id)
-            await botApi.sendTextMessageAsync(telegram_user_id, i18n.__('fallback.server_error'));
+            botApi.sendTextMessageAsync(telegram_user_id, i18n.__('fallback.server_error'));
     },
 
     getJoinButton(){

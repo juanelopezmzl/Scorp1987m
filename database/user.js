@@ -1,18 +1,17 @@
-const { READY, INGROUP, INACTIVE } = require('../types/userstatus');
 const
     query = require('./query'),
-    User = require('../types/user');
+    User = require('../types/user'),
+    { READY, INGROUP, INACTIVE } = require('../types/userstatus'),
+    { CHECKIN } = require('../types/logactivity');
 
 module.exports = {
-
     /**
      * 
-     * @returns {Promise<Array<User>>}
      * 
      * Get all users
      */
-    async getUserAsync(){
-        const sql = `SELECT u.telegram_name,u.telegram_user_name,u.language,i.telegram_name AS inviter_telegram_name,i.telegram_user_name AS inviter_user_name,iv.date_generated AS invite_code_generated_date,u.registered_date,u.status,u.is_ground FROM users u LEFT JOIN invites iv ON u.invite_id=iv.invite_id LEFT JOIN users i ON iv.inviter_user_id=i.telegram_user_id;`;
+    async getUsersAsync(){
+        const sql = `SELECT u.telegram_user_id,u.telegram_name,u.telegram_user_name,u.language,i.telegram_name AS inviter_telegram_name,i.telegram_user_name AS inviter_user_name,u.invite_code_generated_date,u.registered_date,u.status,u.is_ground FROM users u LEFT JOIN users i ON u.inviter_telegram_user_id=i.telegram_user_id;`;
         const result = await query.executeQueryAsync(sql);
         return query.getArray(result);
     },
@@ -34,8 +33,19 @@ module.exports = {
      * 
      * Get users that require to check in
      */
-    async getCheckInUsersAsync(){
-        const sql = `SELECT * FROM users WHERE status IN('${READY}'','${INGROUP}') AND is_ground=true;`
+    async getRequireCheckInUsersAsync(){
+        const sql = `SELECT * FROM users WHERE status IN('${READY}','${INGROUP}') AND is_ground=true;`
+        const result = await query.executeQueryAsync(sql);
+        return query.getArray(result);
+    },
+
+    /**
+     * 
+     * @param {number} previousHours
+     * @returns {Promise<Array<User>>}
+     */
+    async getRequireLogoutUsersAsync(previousHours){
+        const sql = `SELECT u.* FROM users u JOIN (SELECT u.telegram_user_id, (SELECT t.logging_date FROM trackings t WHERE t.telegram_user_id=u.telegram_user_id AND t.logging_date >= NOW()-INTERVAL '${previousHours} hours' AND t.activity = '${CHECKIN}' ORDER BY t.logging_date DESC LIMIT 1) FROM users u WHERE u.is_ground = TRUE AND u.status IN('${READY}','${INGROUP}')) f ON u.telegram_user_id=f.telegram_user_id WHERE logging_date IS NULL;`;
         const result = await query.executeQueryAsync(sql);
         return query.getArray(result);
     },
@@ -50,8 +60,7 @@ module.exports = {
     async getUserByIdAsync(telegram_user_id){
         const sql = `SELECT * FROM users WHERE telegram_user_id=${telegram_user_id};`;
         const result = await query.executeQueryAsync(sql);
-        const obj = query.getObject(result);
-        return (obj) ? new User(obj) : null;
+        return query.getObject(result);
     },
 
     /**
@@ -69,7 +78,8 @@ module.exports = {
             'telegram_user_name',
             'language',
             'pin',
-            'invite_id',
+            'inviter_telegram_user_id',
+            'invite_code_generated_date',
             'registered_date',
             'status',
             'is_ground'
@@ -77,8 +87,7 @@ module.exports = {
 
         const sql = `INSERT INTO users ${str} RETURNING *;`;
         const result = await query.executeQueryAsync(sql);
-        const obj = query.getObject(result);
-        return (obj) ? new User(obj) : null;
+        return query.getObject(result);
     },
 
     /**
@@ -91,14 +100,19 @@ module.exports = {
     async updateUserAsync(user){
         const str = query.getUpdateValueString(user, [
             'status',
-            'language'
+            'language',
+            'pin',
+            'inviter_telegram_user_id',
+            'invite_code_generated_date',
+            'is_ground',
+            'telegram_name',
+            'telegram_user_name'
         ])
 
         const sql = `UPDATE users SET ${str} WHERE telegram_user_id=${user.telegram_user_id} RETURNING *;`;
         console.log(sql);
         const result = await query.executeQueryAsync(sql);
-        const obj = query.getObject(result);
-        return (obj) ? new User(obj) : null;
+        return query.getObject(result);
     },
 
     /** 

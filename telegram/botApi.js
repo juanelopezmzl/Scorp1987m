@@ -4,6 +4,7 @@ const
     config = require('./config'),
     fetch = require('node-fetch'),
     { URL } = require('url');
+const MARKDOWNV2_SPECIAL_CHARACTERS = [ '_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!' ];
 
 module.exports = {
     /**
@@ -33,9 +34,9 @@ module.exports = {
             console.error({
                 status: response.status,
                 statusText: response.statusText,
-                url: urlStr,
+                path: path,
                 body: json,
-                error: response.body
+                error: (await response.json()).description
             });
             return null;
         }
@@ -162,5 +163,21 @@ module.exports = {
             text: text,
             reply_markkup: {}
         })
+    },
+
+    /**
+     * 
+     * @param {string} text 
+     * @param {Array<string>} exceptions 
+     * @returns {string}
+     */
+    getMarkdownV2Text(text, exceptions = null){
+        let toReturn = text;
+        MARKDOWNV2_SPECIAL_CHARACTERS.forEach((c) => {
+            if(exceptions && exceptions.includes(c)){}
+            else
+                toReturn = toReturn.replace(c, `\\${c}`);
+        });
+        return toReturn;
     }
 }

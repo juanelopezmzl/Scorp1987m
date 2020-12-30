@@ -15,6 +15,8 @@ module.exports = {
 
     TRYINVITE : 'TryInvite',
 
+    TRYREGISTER : 'TryReg',
+
     TRYLOGIN : 'TryLogin',
 
     CHECKIN : 'Checkin',
