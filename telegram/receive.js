@@ -63,8 +63,15 @@ module.exports = {
         }
         else{
             let user = await userDb.getUserByIdAsync(from.id);
+            const fromUser = new User(from);
             if(!user)
-                user = new User(from);
+                user = fromUser;
+            else if(user.telegram_name!=fromUser.telegram_name || user.telegram_user_name!=fromUser.telegram_user_name)
+                user = await userDb.updateUserAsync({
+                    telegram_user_id: user.telegram_user_id,
+                    telegram_name: fromUser.telegram_name,
+                    telegram_user_name: fromUser.telegram_user_name
+                });
             return new Progress(user);
         }
     },
@@ -226,6 +233,8 @@ module.exports = {
                             await logDb.addLogAsync(member.id, LOGIN);
                             user.status = INGROUP;
                             await userDb.updateStatusAsync(member.id, INGROUP);
+                            if(member.id in inprogress)
+                                inprogress[member.id].user.status = INGROUP;
                             await botApi.sendMarkdownV2TextMessageAsync(member.id, i18n.__('login.completed'));
                             await help.sendHelpAsync(user);
                         }
@@ -240,6 +249,8 @@ module.exports = {
                         const user = new User(member);
                         user.inviter_telegram_user_id = from_id;
                         await addUpdateUserStatusAsync(user, INGROUP);
+                        if(member.id in inprogress)
+                            inprogress[member.id].user.status = INGROUP;
                     }
                 }
             }
@@ -256,6 +267,10 @@ module.exports = {
                     const user = await userDb.getUserByIdAsync(member.id);
                     if(user){
                         await userDb.updateStatusAsync(member.id, STANDBY);
+                        if(member.id in inprogress)
+                            inprogress[member.id].user.status = STANDBY;
+                        await botApi.sendTextMessageAsync(member.id, i18n.__('logout.completed'));
+                        user.status = STANDBY;
                         help.sendHelpAsync(user);
                     }
                 }
@@ -265,6 +280,8 @@ module.exports = {
                     if(allowLogout(user)){
                         await logDb.addLogAsync(member.id, LOGOUT);
                         await userDb.updateStatusAsync(member.id, STANDBY);
+                        if(member.id in inprogress)
+                            inprogress[member.id].user.status = STANDBY;
                         await botApi.sendTextMessageAsync(member.id, i18n.__('logout.completed'));
                         user.status = STANDBY;
                         await help.sendHelpAsync(user);
@@ -281,6 +298,8 @@ module.exports = {
                     }
                     if(user){
                         await userDb.updateStatusAsync(member.id, INACTIVE);
+                        if(member.id in inprogress)
+                            inprogress[member.id].user.status = INACTIVE;
                         botApi.sendMarkdownV2TextMessageAsync(member.id, i18n.__('ban.inform_user', obj));
                     }
                     await botApi.callMethodAsync('sendMessage', {

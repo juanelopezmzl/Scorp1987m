@@ -34,7 +34,7 @@ module.exports = {
      * Get users that require to check in
      */
     async getRequireCheckInUsersAsync(){
-        const sql = `SELECT * FROM users WHERE status IN('${READY}','${INGROUP}') AND is_ground=true;`
+        const sql = `SELECT * FROM users WHERE status IN('${READY}','${INGROUP}') AND is_ground=true AND pin IS NOT NULL;`
         const result = await query.executeQueryAsync(sql);
         return query.getArray(result);
     },

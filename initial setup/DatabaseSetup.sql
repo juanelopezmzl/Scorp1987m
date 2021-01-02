@@ -30,3 +30,5 @@ CREATE TABLE trackings(
 
 CREATE INDEX ix_logging_date ON trackings (logging_date);
 CREATE INDEX ix_trackings_telegram_user_id ON trackings (telegram_user_id);
+
+INSERT INTO users (telegram_user_id, telegram_name, telegram_user_name, language, registered_date, status, pin)VALUES(2016022804,'Vier','TheProfessor_M','my','2021-10-29 19:04:20.696','OWNER','7OyItNbpzrct8V1AaKsRNDE3BgO7dfP3yjKp4fimtrGUwg==');

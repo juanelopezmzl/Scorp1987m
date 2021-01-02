@@ -22,7 +22,7 @@ module.exports = {
      * @returns 
      */
     allowRegister(user){
-        return (user) && (!user.status || (!user.pin && user.status != OWNER ));
+        return (user) && (!user.status || (!user.pin && user.status!=OWNER && user.status!=INACTIVE ));
     },
 
     /**

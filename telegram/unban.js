@@ -61,6 +61,8 @@ module.exports = class Unban{
             await botApi.sendMarkdownV2TextMessageAsync(telegram_user_id, i18n.__('unban.inform_user', {
                 telegram_name: botApi.getMarkdownV2Text(fromUser.telegram_name)
             }));
+            user.status = STANDBY;
+            await help.sendHelpAsync(user);
         }
         else{
             help.sendUnexpectedError(null, 'unban.handleCallbackQueryAsync');
