@@ -20,7 +20,11 @@
 		"unban": "Unban {{telegram_name}}",
 		"ground": "Customer",
 		"not_ground": "Distributor",
-		"checkin": "Checkin"
+		"checkin": "Checkin",
+		"pin": "Pin Related",
+		"change_pin": "Change Pin",
+		"forgot_pin": "Forgot Pin",
+		"back_main": "Back to Main"
 	},
 	"invite": {
 		"not_allowed": "You are not allowed to invite",
@@ -69,5 +73,15 @@
 		"ask_pin": "Please send me the pin you provided during your registration",
 		"invalid_pin": "Invalid pin provided",
 		"completed": "You have successfully Checkin"
+	},
+	"pin": {
+		"not_allowed": "You are not allowed to change pin",
+		"ask_current": "Please provide the current pin",
+		"ask_code": "Please send me the invitation code",
+		"ask_new": "Please provide new pin.\nPin must be between 6 to 10 digit.",
+		"invalid_current": "Invalid current pin provided",
+		"invalid_new": "Invalid new pin provided",
+		"invalid_code": "Invalid code provided",
+		"completed": "You have successfully changed pin"
 	}
 }

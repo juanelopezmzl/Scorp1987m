@@ -2,7 +2,7 @@ const
     query = require('./query'),
     User = require('../types/user'),
     { READY, INGROUP, INACTIVE } = require('../types/userstatus'),
-    { CHECKIN } = require('../types/logactivity');
+    { CHECKIN, LOGIN } = require('../types/logactivity');
 
 module.exports = {
     /**
@@ -45,7 +45,7 @@ module.exports = {
      * @returns {Promise<Array<User>>}
      */
     async getRequireLogoutUsersAsync(previousHours){
-        const sql = `SELECT u.* FROM users u JOIN (SELECT u.telegram_user_id, (SELECT t.logging_date FROM trackings t WHERE t.telegram_user_id=u.telegram_user_id AND t.logging_date >= NOW()-INTERVAL '${previousHours} hours' AND t.activity = '${CHECKIN}' ORDER BY t.logging_date DESC LIMIT 1) FROM users u WHERE u.is_ground = TRUE AND u.status IN('${READY}','${INGROUP}')) f ON u.telegram_user_id=f.telegram_user_id WHERE logging_date IS NULL;`;
+        const sql = `SELECT u.* FROM users u JOIN (SELECT u.telegram_user_id, (SELECT t.logging_date FROM trackings t WHERE t.telegram_user_id=u.telegram_user_id AND t.logging_date >= NOW()-INTERVAL '${previousHours} hours' AND t.activity IN ('${CHECKIN}','${LOGIN}') ORDER BY t.logging_date DESC LIMIT 1) FROM users u WHERE u.is_ground = TRUE AND u.status IN('${READY}','${INGROUP}')) f ON u.telegram_user_id=f.telegram_user_id WHERE logging_date IS NULL;`;
         const result = await query.executeQueryAsync(sql);
         return query.getArray(result);
     },
@@ -138,6 +138,19 @@ module.exports = {
         return await this.updateUserAsync({
             telegram_user_id: telegram_user_id,
             language: language
+        });
+    },
+
+    /**
+     * 
+     * @param {number} telegram_user_id 
+     * @param {string} pin 
+     * @returns 
+     */
+    async updatePinAsync(telegram_user_id, pin){
+        return await this.updateUserAsync({
+            telegram_user_id: telegram_user_id,
+            pin: pin
         });
     }
 }

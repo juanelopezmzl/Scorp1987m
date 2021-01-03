@@ -2,7 +2,7 @@
 
 const
     i18n = require('../i18n.config'),
-    { replaceNumber } = require('../helper');
+    { replaceNumber, checkPin } = require('../helper');
 const
     inviteDb = require('../database/invite'),
     userDb = require('../database/user'),
@@ -42,13 +42,7 @@ module.exports = class Register{
             case Register.type:
                 await botApi.editTextAndRemoveReplyMarkupAsync(this.webhookEvent, i18n.__('menu.register'));
 
-                if(!allowRegister(this.user)){
-                    this.payload.complete();
-                    await logDb.addLogAsync(this.user.telegram_user_id, TRYREGISTER);
-                    await botApi.sendTextMessageAsync(chat_id, i18n.__('register.not_allowed'));
-                    await help.sendHelpAsync(this.user);
-                    return;
-                }
+                if(!(await this.isAllowAsync())) return;
 
                 await botApi.sendTextMessageAsync(chat_id, i18n.__('register.ask_code'));
                 this.payload.step = 'ASK_CODE';
@@ -68,13 +62,7 @@ module.exports = class Register{
 
         switch(this.payload.step){
             case 'ASK_CODE':
-                if(!allowRegister(this.user)){
-                    this.payload.complete();
-                    await logDb.addLogAsync(this.user.telegram_user_id, TRYREGISTER);
-                    await botApi.sendTextMessageAsync(chat_id, i18n.__('register.not_allowed'));
-                    await help.sendHelpAsync(this.user);
-                    return;
-                }
+                if(!(await this.isAllowAsync())) return;
 
                 const code = text;
                 const invite_id = await inviteDb.checkInviteAsync(code, this.user.telegram_user_id);
@@ -92,16 +80,10 @@ module.exports = class Register{
             case 'ASK_PIN':
                 const pin = replaceNumber(text);
                 await botApi.deleteMessageAsync(chat_id, message_id);
+                
+                if(!(await this.isAllowAsync())) return;
 
-                if(!allowRegister(this.user)){
-                    this.payload.complete();
-                    await logDb.addLogAsync(this.user.telegram_user_id, TRYREGISTER);
-                    await botApi.sendTextMessageAsync(chat_id, i18n.__('register.not_allowed'));
-                    await help.sendHelpAsync(this.user);
-                    return;
-                }
-
-                if(this.checkPin(pin)){
+                if(checkPin(pin)){
                     this.payload.complete();
                     // use Invite
                     const invite = await inviteDb.useInviteAsync(this.payload.invite_id); // Use invite code
@@ -143,11 +125,14 @@ module.exports = class Register{
         }
     }
 
-    checkPin(text){
-        const pin = text.trim();
-        if(pin.length < 6 || pin.length > 10) return false;
-        const parsedPin = parseInt(pin);
-        if(isNaN(parsedPin)) return false;
+    async isAllowAsync(){
+        if(!allowRegister(this.user)){
+            this.payload.complete();
+            await logDb.addLogAsync(this.user.telegram_user_id, TRYREGISTER);
+            await botApi.sendTextMessageAsync(chat_id, i18n.__('register.not_allowed'));
+            await help.sendHelpAsync(this.user);
+            return false;
+        }
         else return true;
     }
 }

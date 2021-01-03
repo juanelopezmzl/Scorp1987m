@@ -32,14 +32,16 @@ module.exports = class Logout{
         const chat_id = this.webhookEvent.callback_query.message.chat.id;
 
         this.payload.complete();
-        if(!allowLogout(this.user)){
-            await botApi.sendTextMessageAsync(chat_id, i18n.__('logout.not_allowed'));
-            await help.sendHelpAsync(this.user);
-        }
 
         switch(data){
             case Logout.type:
                 await botApi.editTextAndRemoveReplyMarkupAsync(this.webhookEvent, i18n.__('menu.logout'));
+                
+                if(!allowLogout(this.user)){
+                    await botApi.sendTextMessageAsync(chat_id, i18n.__('logout.not_allowed'));
+                    await help.sendHelpAsync(this.user);
+                }
+
                 await botApi.banChatMember(this.user.telegram_user_id);
                 break;
             default:

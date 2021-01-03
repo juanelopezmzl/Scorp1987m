@@ -21,6 +21,7 @@ const
     Logout = require('./logout'),
     Unban = require('./unban'),
     CheckIn = require('./checkin'),
+    Pin = require('./pin'),
     { isReady, allowLogout } = require('./check');
 
 /**
@@ -42,7 +43,7 @@ const addUpdateUserStatusAsync = async function(user, status){
 /** @type {User} */
 let botUser = null;
 
-const WorkFlows = [Language, Invite, Register, Login, Logout, Unban, CheckIn];
+const WorkFlows = [Language, Invite, Register, Login, Logout, Unban, CheckIn, Pin];
 
 const inprogress = {};
 

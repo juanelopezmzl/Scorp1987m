@@ -45,14 +45,8 @@ module.exports = class Login{
             case Login.type:
                 await botApi.editTextAndRemoveReplyMarkupAsync(this.webhookEvent, i18n.__('menu.login'));
 
-                if(!allowLogin(this.user)){
-                    this.payload.complete();
-                    await logDb.addLogAsync(this.user.telegram_user_id, TRYLOGIN);
-                    await botApi.sendTextMessageAsync(chat_id, i18n.__('login.not_allowed'));
-                    await help.sendHelpAsync(this.user);
-                    return;
-                }
-
+                if(!(await this.isAllowAsync())) return;
+                
                 await botApi.sendTextMessageAsync(chat_id, i18n.__('login.ask_pin'));
                 this.payload.step = 'ASK_PIN';
                 break;
@@ -74,13 +68,7 @@ module.exports = class Login{
                 const pin = replaceNumber(text);
                 await botApi.deleteMessageAsync(chat_id, message_id);
 
-                if(!allowLogin(this.user)){
-                    this.payload.complete();
-                    await logDb.addLogAsync(this.user.telegram_user_id, TRYLOGIN);
-                    await botApi.sendTextMessageAsync(chat_id, i18n.__('login.not_allowed'));
-                    await help.sendHelpAsync(this.user);
-                    return;
-                }
+                if(!(await this.isAllowAsync())) return;
 
                 if(crypto.checkPassword(Buffer.from(this.user.pin, 'base64'), pin, cryptoConfig.pinSalt)){
                     this.payload.complete();
@@ -105,5 +93,16 @@ module.exports = class Login{
                 await help.sendHelpAsync(this.user);
                 break;
         }
+    }
+
+    async isAllowAsync(){
+        if(!allowLogin(this.user)){
+            this.payload.complete();
+            await logDb.addLogAsync(this.user.telegram_user_id, TRYLOGIN);
+            await botApi.sendTextMessageAsync(chat_id, i18n.__('login.not_allowed'));
+            await help.sendHelpAsync(this.user);
+            return false;
+        }
+        else return true;
     }
 }

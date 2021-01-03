@@ -21,5 +21,9 @@ module.exports = {
 
     CHECKIN : 'Checkin',
 
-    TRYCHECKIN : 'TryCheckin'
+    TRYCHECKIN : 'TryCheckin',
+
+    TRYCHANGEPIN : 'TryCngPin',
+
+    CHANGEDPIN: 'ChangedPin'
 }

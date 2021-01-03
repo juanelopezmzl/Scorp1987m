@@ -2,7 +2,6 @@ const
     i18n = require('../i18n.config'),
     { replaceNumber } = require('../helper');
 const
-    userDb = require('../database/user'),
     logDb = require('../database/logging');
 const
     User = require('../types/user'),
@@ -58,12 +57,7 @@ module.exports = class CheckIn{
             case CheckIn.type:
                 await botApi.editTextAndRemoveReplyMarkupAsync(this.webhookEvent, i18n.__('menu.checkin'));
 
-                if(!allowCheckin(this.user)){
-                    this.payload.complete();
-                    await botApi.sendTextMessageAsync(chat_id, i18n.__('checkin.not_allowed'));
-                    await help.sendHelpAsync(this.user);
-                    return;
-                }
+                if(!(await this.isAllowAsync())) return;
 
                 await botApi.sendTextMessageAsync(chat_id, i18n.__('checkin.ask_pin'));
                 this.payload.step = 'ASK_PIN';
@@ -76,7 +70,6 @@ module.exports = class CheckIn{
         }
     }
 
-
     async handleNewPrivateMessageAsync(){
         const chat_id = this.webhookEvent.message.chat.id;
         
@@ -86,13 +79,8 @@ module.exports = class CheckIn{
             case 'ASK_PIN':
                 const pin = replaceNumber(text);
                 await botApi.deleteMessageAsync(chat_id, message_id);
-                
-                if(!allowCheckin(this.user)){
-                    this.payload.complete();
-                    await botApi.sendTextMessageAsync(chat_id, i18n.__('checkin.not_allowed'));
-                    await help.sendHelpAsync(this.user);
-                    return;
-                }
+                                
+                if(!(await this.isAllowAsync())) return;
 
                 if(crypto.checkPassword(Buffer.from(this.user.pin, 'base64'), pin, cryptoConfig.pinSalt)){
                     this.payload.complete();
@@ -111,5 +99,15 @@ module.exports = class CheckIn{
                 await help.sendHelpAsync(this.user);
                 break;
         }
+    }
+
+    async isAllowAsync(){
+        if(!allowCheckin(this.user)){
+            this.payload.complete();
+            await botApi.sendTextMessageAsync(chat_id, i18n.__('checkin.not_allowed'));
+            await help.sendHelpAsync(this.user);
+            return false;
+        }
+        else return true;
     }
 }

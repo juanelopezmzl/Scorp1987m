@@ -80,7 +80,7 @@ app.get(config.logUrl, async (req, res) => {
 
   const limit = req.query.limit;
   const page = req.query.page;
-  const telegram_user_name = req.query.telegram_user_name;
+  const telegram_name = req.query.telegram_name;
   if(limit)
     if(isNaN(limit)){
       res.status(400).send({ message: 'limit must be a valid integer value.' });
@@ -102,7 +102,7 @@ app.get(config.logUrl, async (req, res) => {
     }
   
   try{
-    res.status(200).send(await logDb.getLogAsync(limit, page, telegram_user_name));
+    res.status(200).send(await logDb.getLogAsync(limit, page, telegram_name));
   }
   catch(ex){
     res.status(400).send({

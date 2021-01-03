@@ -67,6 +67,15 @@ module.exports = {
      * @returns 
      */
     allowUnban(user){
-        return (user) && (user.status==INACTIVE)
+        return (user) && (user.status==INACTIVE);
+    },
+
+    /**
+     * 
+     * @param {User} user 
+     * @returns 
+     */
+    allowChangePin(user){
+        return (user) && (user.pin) && (user.status==READY || user.status==INGROUP || user.status==STANDBY);
     }
 }

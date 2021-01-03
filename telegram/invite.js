@@ -42,12 +42,7 @@ module.exports = class Invite{
             case Invite.type:
                 await botApi.editTextAndRemoveReplyMarkupAsync(this.webhookEvent, i18n.__('menu.invite'));
 
-                if(!allowInvite(this.user)){
-                    await logDb.addLogAsync(this.user.telegram_user_id, TRYINVITE);
-                    await botApi.sendTextMessageAsync(chat_id, i18n.__('invite.not_allowed'));
-                    await help.sendHelpAsync(this.user);
-                    return;
-                }
+                if(!(await this.isAllowAsync())) return;
 
                 // Ask whether is gound or not
                 await botApi.callMethodAsync('sendMessage', {
@@ -68,12 +63,7 @@ module.exports = class Invite{
                 const isground = (data==`${Invite.type}_GROUND`) ? true : false;
                 await botApi.editTextAndRemoveReplyMarkupAsync(this.webhookEvent, i18n.__(menu));
                 
-                if(!allowInvite(this.user)){
-                    await logDb.addLogAsync(this.user.telegram_user_id, TRYINVITE);
-                    await botApi.sendTextMessageAsync(chat_id, i18n.__('invite.not_allowed'));
-                    await help.sendHelpAsync(this.user);
-                    return;
-                }
+                if(!(await this.isAllowAsync())) return;
 
                 const invite = await inviteDb.addInviteAsync(this.user.telegram_user_id, isground);
                 const botUser = new User(await botApi.getMeAsync());
@@ -86,5 +76,15 @@ module.exports = class Invite{
                 help.sendUnexpectedError(this.user.telegram_user_id, 'invite.handleCallbackQueryAsync');
                 break;
         }
+    }
+
+    async isAllowAsync(){
+        if(!allowInvite(this.user)){
+            await logDb.addLogAsync(this.user.telegram_user_id, TRYINVITE);
+            await botApi.sendTextMessageAsync(chat_id, i18n.__('invite.not_allowed'));
+            await help.sendHelpAsync(this.user);
+            return false;
+        }
+        else return true;
     }
 }
