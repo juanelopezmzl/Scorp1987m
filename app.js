@@ -118,9 +118,9 @@ app.get(config.logUrl, async (req, res) => {
 app.post(config.telegramUrl, async (req, res) => {
   const body = req.body;
 
-  // For Debugging only. Please disable for Production
-  console.log('Received Telegram Webhook:');
-  console.dir(body, {depth: null});
+  // // For Debugging only. Please disable for Production
+  // console.log('Received Telegram Webhook:');
+  // console.dir(body, {depth: null});
 
   res.status(200).send('EVENT_RECEIVED');
 
