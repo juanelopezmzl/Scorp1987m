@@ -165,7 +165,7 @@ module.exports = class Pin{
                         await userDb.updateUserAsync({
                             telegram_user_id: this.user.telegram_user_id,
                             pin: this.user.pin,
-                            is_ground: this.payload.is_ground
+                            is_ground: this.payload.invite.is_ground
                         });
                     }
                     else{
