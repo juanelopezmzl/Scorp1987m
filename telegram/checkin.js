@@ -104,7 +104,7 @@ module.exports = class CheckIn{
     async isAllowAsync(){
         if(!allowCheckin(this.user)){
             this.payload.complete();
-            await botApi.sendTextMessageAsync(chat_id, i18n.__('checkin.not_allowed'));
+            await botApi.sendTextMessageAsync(this.user.telegram_user_id, i18n.__('checkin.not_allowed'));
             await help.sendHelpAsync(this.user);
             return false;
         }

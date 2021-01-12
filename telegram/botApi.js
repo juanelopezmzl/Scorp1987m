@@ -162,7 +162,7 @@ module.exports = {
             message_id: callbackEvent.callback_query.message.message_id,
             text: text,
             reply_markkup: {}
-        })
+        });
     },
 
     /**

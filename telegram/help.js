@@ -34,35 +34,6 @@ module.exports = {
      * Send help message to user
      */
     async sendHelpAsync(user){
-        // const inline_keyboard = [];
-        // if(allowChangeLanguage(user))
-        //     inline_keyboard.push([{
-        //         text: i18n.__('menu.language'),
-        //         callback_data: 'LANGUAGE'
-        //     }]);
-        // if(allowRegister(user))
-        //     inline_keyboard.push([{
-        //         text: i18n.__('menu.register'),
-        //         callback_data: 'REGISTER'
-        //     }]);
-        // if(allowInvite(user))
-        //     inline_keyboard.push([{
-        //         text: i18n.__('menu.invite'),
-        //         callback_data: 'INVITE'
-        //     }])
-        // if(allowLogin(user))
-        //     inline_keyboard.push([{
-        //         text: i18n.__('menu.login'),
-        //         callback_data: 'LOGIN'
-        //     }])
-        // if(isReady(user))
-        //     inline_keyboard.push(this.getJoinButton());
-        // if(allowLogout(user))
-        //     inline_keyboard.push([{
-        //         text: i18n.__('menu.logout'),
-        //         callback_data: 'LOGOUT'
-        //     }]);
-
         const inline_keyboard = this.getInlineKeyboards(user);
 
         if(inline_keyboard.length != 0){
@@ -75,6 +46,26 @@ module.exports = {
         else{
             await botApi.sendTextMessageAsync(user.telegram_user_id, i18n.__('get_started.cant_help'));
         }
+    },
+
+    /**
+     * 
+     * @param {User} user 
+     * @param {number} message_id 
+     */
+    async updateHelpAsync(user, message_id){
+        const inline_keyboard = this.getInlineKeyboards(user);
+
+        if(inline_keyboard.length != 0){
+            await botApi.callMethodAsync('editMessageText',{
+                chat_id: user.telegram_user_id,
+                message_id: message_id,
+                text: i18n.__('get_started.help', user),
+                reply_markup: { inline_keyboard: inline_keyboard }
+            });
+        }
+        else
+            await botApi.editTextAndRemoveReplyMarkupAsync(user.telegram_user_id, i18n.__('get_started.cant_help'));
     },
 
     /**
