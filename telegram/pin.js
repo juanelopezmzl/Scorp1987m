@@ -190,7 +190,7 @@ module.exports = class Pin{
     async isAllowAsync(){
         if(!allowChangePin(this.user)){
             this.payload.complete();
-            await botApi.sendTextMessageAsync('pin.not_allowed');
+            await botApi.sendTextMessageAsync(this.user.telegram_user_id, i18n.__('pin.not_allowed'));
             await help.sendHelpAsync(this.user);
             return false;
         }
